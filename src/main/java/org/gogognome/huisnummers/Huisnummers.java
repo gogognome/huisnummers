@@ -3,15 +3,34 @@ package org.gogognome.huisnummers;
 public class Huisnummers {
 
 	public static void main(String[] args) {
-		long m = 1;
-		while (true) {
-			long nSquared = ((m * m) + m) / 2;
-			long n = (long) (Math.sqrt(nSquared) + 0.5);
-			if (n * n == nSquared) {
-				// assertCorrect(n, m);
-				System.out.println(String.format("%d %d", n, m));
+		int nrProcessors = Runtime.getRuntime().availableProcessors();
+		for (int i = 0; i < nrProcessors; i++) {
+			new HuisnummerZoekThread((i + 1), nrProcessors).start();
+		}
+	}
+
+	private static class HuisnummerZoekThread extends Thread {
+
+		private final int start;
+		private final int delta;
+
+		public HuisnummerZoekThread(int start, int delta) {
+			this.start = start;
+			this.delta = delta;
+		}
+
+		@Override
+		public void run() {
+			long m = start;
+			while (true) {
+				long nSquared = ((m * m) + m) / 2;
+				long n = (long) (Math.sqrt(nSquared) + 0.5);
+				if (n * n == nSquared) {
+					// assertCorrect(n, m);
+					System.out.println(String.format("%d %d", n, m));
+				}
+				m += delta;
 			}
-			m++;
 		}
 	}
 
