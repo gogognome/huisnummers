@@ -1,5 +1,23 @@
 package org.gogognome.huisnummers;
 
+/**
+ * Dit algoritme is gebaseerd op de volgende gelijkheid:
+ *
+ * 1 + ... + (n-1) = (n+1) + ... + m
+ *
+ * Pas Gauss toe.
+ *
+ * 1/2 * n * (n-1) = 1/2 * (n+1+m) * (m-n)
+ *
+ * Herschrijven resulteert in:
+ *
+ * n*n = 1/2 * (m*m) + 1/2 * m
+ *
+ * Voor oplopende m wordt n*n uitgerekend. Als n dan een geheel getal blijkt te zijn hebben we een oplossing gevonden: huisnummer n in een straat met nummers 1
+ * tot en met m.
+ *
+ * @author Sander Kooijmans
+ */
 public class Huisnummers {
 
 	public static void main(String[] args) {
@@ -26,7 +44,7 @@ public class Huisnummers {
 				long nSquared = ((m * m) + m) / 2;
 				long n = (long) (Math.sqrt(nSquared) + 0.5);
 				if (n * n == nSquared) {
-					// assertCorrect(n, m);
+					assertCorrect(n, m);
 					System.out.println(String.format("%d %d", n, m));
 				}
 				m += delta;
