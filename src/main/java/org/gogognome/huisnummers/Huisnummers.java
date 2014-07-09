@@ -58,8 +58,9 @@ public class Huisnummers {
 
 			System.out.println("Switching to BigInteger");
 
-			// findNumbers(BigInteger.valueOf((long) Math.sqrt(m)), BigInteger.valueOf(m), BigInteger.valueOf(delta));
-			findNumbers(new BigInteger("6712603325"), new BigInteger("9493054661"), BigInteger.valueOf(1));
+			// findNumbers2(BigInteger.valueOf((long) Math.sqrt(m)), BigInteger.valueOf(m), BigInteger.valueOf(delta));
+			findNumbers2(new BigInteger("7134842596"), new BigInteger("10090191164"), BigInteger.valueOf(1));
+			findNumbers(new BigInteger("7134842596"), new BigInteger("10090191164"), BigInteger.valueOf(1));
 		}
 
 		private void findNumbers(BigInteger bigN, BigInteger bigM, BigInteger bigDelta) {
@@ -81,6 +82,27 @@ public class Huisnummers {
 				}
 			}
 		}
+
+		private void findNumbers2(BigInteger bigN, BigInteger bigM, BigInteger bigDelta) {
+			long nextLoggingTimestamp = System.currentTimeMillis() + 60000;
+			while (true) {
+				BigInteger nSquaredTimesTwo = bigN.multiply(bigN).shiftLeft(1);
+				while (bigM.multiply(bigM.add(BigInteger.ONE)).compareTo(nSquaredTimesTwo) < 0) {
+					bigM = bigM.add(BigInteger.ONE);
+				}
+				if (bigM.multiply(bigM.add(BigInteger.ONE)).compareTo(nSquaredTimesTwo) == 0) {
+					System.out.println(String.format("OPLOSSING GEVONDEN: %s %s", bigN.toString(), bigM.toString()));
+				}
+				bigN = bigN.add(bigDelta);
+
+				long now = System.currentTimeMillis();
+				if (now >= nextLoggingTimestamp) {
+					System.out.println("bezig met n: " + bigN + ", m: " + bigM);
+					nextLoggingTimestamp = now + 60000;
+				}
+			}
+		}
+
 	}
 
 	private final static BigInteger sqrt(BigInteger n) {
