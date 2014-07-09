@@ -1,5 +1,7 @@
 package org.gogognome.huisnummers;
 
+import java.math.BigInteger;
+
 /**
  * Dit algoritme is gebaseerd op de volgende gelijkheid:
  *
@@ -21,9 +23,10 @@ package org.gogognome.huisnummers;
 public class Huisnummers {
 
 	public static void main(String[] args) {
-		int nrProcessors = Runtime.getRuntime().availableProcessors();
-		for (int i = 0; i < nrProcessors; i++) {
-			new HuisnummerZoekThread((i + 1), nrProcessors).start();
+		int nrThreads = Runtime.getRuntime().availableProcessors() / 2;
+		nrThreads = 1;
+		for (int i = 0; i < nrThreads; i++) {
+			new HuisnummerZoekThread((i + 1), nrThreads).start();
 		}
 	}
 
@@ -40,7 +43,10 @@ public class Huisnummers {
 		@Override
 		public void run() {
 			long m = start;
-			while (true) {
+			// Above a limit an overflow occurs in the calculations. After this limit has been reached, switch to the slower BigIntegers.
+			long limitForLongs = (long) Math.sqrt(Long.MAX_VALUE);
+			limitForLongs = 1;
+			while (m < limitForLongs) {
 				long nSquared = ((m * m) + m) / 2;
 				long n = (long) (Math.sqrt(nSquared) + 0.5);
 				if (n * n == nSquared) {
@@ -49,7 +55,45 @@ public class Huisnummers {
 				}
 				m += delta;
 			}
+
+			System.out.println("Switching to BigInteger");
+
+			// findNumbers(BigInteger.valueOf((long) Math.sqrt(m)), BigInteger.valueOf(m), BigInteger.valueOf(delta));
+			findNumbers(new BigInteger("6712603325"), new BigInteger("9493054661"), BigInteger.valueOf(1));
 		}
+
+		private void findNumbers(BigInteger bigN, BigInteger bigM, BigInteger bigDelta) {
+			long nextLoggingTimestamp = System.currentTimeMillis() + 60000;
+			while (true) {
+				BigInteger nSquared = ((bigM.multiply(bigM)).add(bigM)).shiftRight(1);
+				while (bigN.multiply(bigN).compareTo(nSquared) < 0) {
+					bigN = bigN.add(BigInteger.ONE);
+				}
+				if (bigN.multiply(bigN).compareTo(nSquared) == 0) {
+					System.out.println(String.format("OPLOSSING GEVONDEN: %s %s", bigN.toString(), bigM.toString()));
+				}
+				bigM = bigM.add(bigDelta);
+
+				long now = System.currentTimeMillis();
+				if (now >= nextLoggingTimestamp) {
+					System.out.println("bezig met n: " + bigN + ", m: " + bigM);
+					nextLoggingTimestamp = now + 60000;
+				}
+			}
+		}
+	}
+
+	private final static BigInteger sqrt(BigInteger n) {
+		BigInteger a = BigInteger.ONE;
+		BigInteger b = n.shiftRight(5).add(BigInteger.valueOf(8));
+		while (b.compareTo(a) >= 0) {
+			BigInteger mid = a.add(b).shiftRight(1);
+			if (mid.multiply(mid).compareTo(n) > 0)
+				b = mid.subtract(BigInteger.ONE);
+			else
+				a = mid.add(BigInteger.ONE);
+		}
+		return a.subtract(BigInteger.ONE);
 	}
 
 	private static void assertCorrect(long n, long m) {
